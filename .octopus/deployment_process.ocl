@@ -7,7 +7,6 @@ step "deploy-trident-web" {
 
     action "remove-from-lb" {
         action_type = "Octopus.Script"
-        environments = ["staging", "production"]
         name = "Remove from LB"
         properties = {
             Octopus.Action.RunOnServer = "true"

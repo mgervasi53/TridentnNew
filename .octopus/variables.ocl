@@ -44,3 +44,9 @@ variable "Project.Database.User.Name" {
         environment = ["production"]
     }
 }
+
+variable "Octopus.ServiceNow.ChangeRequest.Number" {
+    value "Octopus.ServiceNow.ChangeRequest.Number" {
+        environment = ["production"]
+    }
+}

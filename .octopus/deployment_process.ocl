@@ -78,6 +78,40 @@ step "manual-intervention-required" {
     }
 }
 
+step "deploy-the-database-changes" {
+    name = "Deploy the Database Changes"
+
+    action {
+        action_type = "Octopus.Script"
+        properties = {
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Script.ScriptBody = <<-EOT
+                $packagePath = $OctopusParameters["Octopus.Action.Package[Trident.Database].ExtractedPath"]
+                $connectionString = $OctopusParameters["Project.Connection.String"]
+                
+                cd $packagePath
+                $appToRun = ".\Octopus.Trident.Database.DbUp"
+                
+                & $appToRun --ConnectionString="$connectionString"
+            EOT
+            Octopus.Action.Script.ScriptSource = "Inline"
+            Octopus.Action.Script.Syntax = "PowerShell"
+        }
+        worker_pool = "default-worker-pool-1"
+
+        packages "Trident.Database" {
+            acquisition_location = "Server"
+            feed = "octopus-server-built-in"
+            package_id = "Trident.Database"
+            properties = {
+                Extract = "True"
+                Purpose = ""
+                SelectionMode = "immediate"
+            }
+        }
+    }
+}
+
 step "deploy-trident-web" {
     name = "Deploy Trident.Web"
     properties = {
@@ -176,39 +210,5 @@ step "slack-send-simple-notification" {
             ssn_Username = "Trident Project In Octopus Deploy"
         }
         worker_pool = "default-worker-pool-1"
-    }
-}
-
-step "deploy-the-database-changes" {
-    name = "Deploy the Database Changes"
-
-    action {
-        action_type = "Octopus.Script"
-        properties = {
-            Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Script.ScriptBody = <<-EOT
-                $packagePath = $OctopusParameters["Octopus.Action.Package[Trident.Database].ExtractedPath"]
-                $connectionString = $OctopusParameters["Project.Connection.String"]
-                
-                cd $packagePath
-                $appToRun = ".\Octopus.Trident.Database.DbUp"
-                
-                & $appToRun --ConnectionString="$connectionString"
-            EOT
-            Octopus.Action.Script.ScriptSource = "Inline"
-            Octopus.Action.Script.Syntax = "PowerShell"
-        }
-        worker_pool = "default-worker-pool-1"
-
-        packages "Trident.Database" {
-            acquisition_location = "Server"
-            feed = "octopus-server-built-in"
-            package_id = "Trident.Database"
-            properties = {
-                Extract = "True"
-                Purpose = ""
-                SelectionMode = "immediate"
-            }
-        }
     }
 }

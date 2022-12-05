@@ -1,42 +1,3 @@
-variable "Project.Database.Server.Name" {
-    value "Trident_Dev" {
-        environment = ["development"]
-    }
-
-    value "Trident_QA" {
-        description = ""
-        environment = ["qa"]
-    }
-
-    value "Trident_Prod" {
-        description = ""
-        environment = ["production"]
-    }
-
-    value "Trident_Staging " {
-        description = ""
-        environment = ["staging"]
-    }
-}
-
-variable "Project.Database.User.Name" {
-    value "Trident_User_Dev " {
-        environment = ["development"]
-    }
-
-    value "Trident_User_QA" {
-        environment = ["qa"]
-    }
-
-    value "Trident_User_Staging " {
-        environment = ["staging"]
-    }
-
-    value "Trident_User_Prod" {
-        environment = ["production"]
-    }
-}
-
 variable "Octopus.ServiceNow.ChangeRequest.Number" {
     value "" {
         environment = ["production"]
@@ -56,5 +17,18 @@ variable "ConnectionStrings:Database" {
 }
 
 variable "Project.Database.Name" {
-    value "Trident (scoped to Production)" {}
+    value "Trident" {
+        environment = ["production"]
+    }
+
+    value "Trident_#{Octopus.Environment.Name} " {
+        description = ""
+        environment = ["qa", "development", "staging"]
+    }
+}
+
+variable "Project.Database.Server.Name" {
+    value "(localdb)\\MSSQLLocalDB " {
+        description = ""
+    }
 }

@@ -164,3 +164,17 @@ step "slack-send-simple-notification" {
         worker_pool = "default-worker-pool-1"
     }
 }
+
+step "manual-intervention-required" {
+    name = "Manual Intervention Required"
+
+    action {
+        action_type = "Octopus.Manual"
+        properties = {
+            Octopus.Action.Manual.BlockConcurrentDeployments = "False"
+            Octopus.Action.Manual.Instructions = "Please approve the database delta script found in the artifacts section."
+            Octopus.Action.Manual.ResponsibleTeamIds = "dba,global/octopus-managers"
+        }
+        worker_pool_variable = ""
+    }
+}

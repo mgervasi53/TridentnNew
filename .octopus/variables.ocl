@@ -1,52 +1,34 @@
-variable "ConnectionStrings:Database" {
-    value "Server=#{Project.Database.Server.Name};Database=#{Project.Database.Name};User ID=#{Project.Database.User.Name};Password=#{Project.Database.User.Password};" {}
-}
-
-variable "Project.Database.Name" {
-    value "Trident" {}
-}
-
-variable "Project.Database.Server.Name" {
-    value "Trident_Dev" {
-        environment = ["development"]
-    }
-
-    value "Trident_QA" {
-        description = ""
-        environment = ["qa"]
-    }
-
-    value "Trident_Prod" {
-        description = ""
-        environment = ["production"]
-    }
-
-    value "Trident_Staging " {
-        description = ""
-        environment = ["staging"]
-    }
-}
-
-variable "Project.Database.User.Name" {
-    value "Trident_User_Dev " {
-        environment = ["development"]
-    }
-
-    value "Trident_User_QA" {
-        environment = ["qa"]
-    }
-
-    value "Trident_User_Staging " {
-        environment = ["staging"]
-    }
-
-    value "Trident_User_Prod" {
-        environment = ["production"]
-    }
-}
-
 variable "Octopus.ServiceNow.ChangeRequest.Number" {
     value "" {
         environment = ["production"]
     }
+}
+
+variable "Project.Database.Report.Path" {
+    value "C:\\DatabaseReports\\#{Octopus.Environment.Name}" {}
+}
+
+variable "ConnectionStrings:Database" {
+    value "#(Project.Database.Name)" {}
+}
+
+variable "Project.Database.Name" {
+    value "Trident" {
+        environment = ["production"]
+    }
+
+    value "Trident_#{Octopus.Environment.Name} " {
+        description = ""
+        environment = ["qa", "development", "staging"]
+    }
+}
+
+variable "Project.Database.Server.Name" {
+    value "(localdb)\\MSSQLLocalDB " {
+        description = ""
+    }
+}
+
+variable "Project.Connection.String" {
+    value "Server=#{Project.Database.Server.Name};Integrated Security=true;Database=#{Project.Database.Name}" {}
 }

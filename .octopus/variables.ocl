@@ -32,3 +32,7 @@ variable "Project.Database.Server.Name" {
 variable "Project.Connection.String" {
     value "Server=#{Project.Database.Server.Name};Integrated Security=true;Database=#{Project.Database.Name}" {}
 }
+
+variable "Project.Database.ApprovalRequired" {
+    value "#{Octopus.Action[Generate Database Delta Report].Output.ApprovalRequired}" {}
+}

@@ -4,10 +4,6 @@ variable "Octopus.ServiceNow.ChangeRequest.Number" {
     }
 }
 
-variable "Project.Database.Report.Path" {
-    value "C:\\DatabaseReports\\#{Octopus.Environment.Name}" {}
-}
-
 variable "ConnectionStrings:Database" {
     value "#(Project.Database.Name)" {}
 }
@@ -35,4 +31,12 @@ variable "Project.Connection.String" {
 
 variable "Project.Database.ApprovalRequired" {
     value "#{Octopus.Action[Auto-Approve Database Delta Script].Output.ApprovalRequired}" {}
+}
+
+variable "Project.Database.Report.Path" {
+    value "C:\\DatabaseReports\\#{Octopus.Environment.Name}" {}
+}
+
+variable "Project.Database.Report.Path2" {
+    value "C:\\DatabaseReports\\#{Octopus.Environment.Name}" {}
 }

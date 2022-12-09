@@ -63,6 +63,19 @@ step "generate-database-delta-report" {
     }
 }
 
+step "auto-approve-database-delta-script" {
+    name = "Auto-Approve Database Delta Script"
+
+    action {
+        properties = {
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Template.Id = "ActionTemplates-41"
+            Octopus.Action.Template.Version = "0"
+        }
+        worker_pool = "default-worker-pool-1"
+    }
+}
+
 step "manual-intervention-required" {
     condition = "Variable"
     name = "Manual Intervention Required"

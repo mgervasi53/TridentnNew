@@ -42,7 +42,11 @@ step "run-octopus-deploy-runbook" {
 }
 
 step "generate-database-delta-report" {
+    condition = "Variable"
     name = "Generate Database Delta Report"
+    properties = {
+        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Octopus.Action[Calculate Deployment Mode].Output.RunOnDeploy}#{/unless}."
+    }
 
     action {
         action_type = "Octopus.Script"

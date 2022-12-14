@@ -85,7 +85,11 @@ step "generate-database-delta-report" {
 }
 
 step "auto-approve-database-delta-script" {
+    condition = "Variable"
     name = "Auto-Approve Database Delta Script"
+    properties = {
+        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Octopus.Action[Calculate Deployment Mode].Output.RunOnDeploy}#{/unless}."
+    }
 
     action {
         properties = {

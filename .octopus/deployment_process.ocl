@@ -12,7 +12,11 @@ step "calculate-deployment-mode" {
 }
 
 step "run-octopus-deploy-runbook" {
+    condition = "Variable"
     name = "Deploy Database Runbook"
+    properties = {
+        Octopus.Step.ConditionVariableExpression = "#{unless Octopus.Deployment.Error}#{Octopus.Action[Calculate Deployment Mode].Output.RunOnDeploy}#{/unless}."
+    }
 
     action {
         properties = {

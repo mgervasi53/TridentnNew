@@ -104,6 +104,21 @@ step "auto-approve-database-delta-script" {
     }
 }
 
+step "enable-maintenance-mode" {
+    name = "Enable Maintenance Mode"
+
+    action {
+        action_type = "Octopus.Script"
+        properties = {
+            Octopus.Action.RunOnServer = "true"
+            Octopus.Action.Script.ScriptBody = "Write-Host \"Enable Maintenance Mode\""
+            Octopus.Action.Script.ScriptSource = "Inline"
+            Octopus.Action.Script.Syntax = "PowerShell"
+        }
+        worker_pool = "default-worker-pool-1"
+    }
+}
+
 step "manual-intervention-required" {
     condition = "Variable"
     name = "Manual Intervention Required"
@@ -156,28 +171,10 @@ step "deploy-the-database-changes" {
     }
 }
 
-step "deploy-trident-web" {
-    name = "Deploy Trident.Web"
+step "deploy-trident-web-1" {
+    name = "Deploy Trident.Web 1"
     properties = {
-        Octopus.Action.MaxParallelism = "1"
         Octopus.Action.TargetRoles = "trident-web"
-    }
-
-    action "remove-from-lb" {
-        action_type = "Octopus.Script"
-        name = "Remove from LB"
-        properties = {
-            Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Script.ScriptBody = <<-EOT
-                $machineName = $OctopusParameters["Octopus.Machine.Name"]
-                
-                Write-Host "Remove $machineName from the Load Balancer."
-                
-            EOT
-            Octopus.Action.Script.ScriptSource = "Inline"
-            Octopus.Action.Script.Syntax = "PowerShell"
-        }
-        worker_pool = "default-worker-pool-1"
     }
 
     action "deploy-trident-web" {
@@ -201,57 +198,35 @@ step "deploy-trident-web" {
             }
         }
     }
-
-    action "add-to-lb" {
-        action_type = "Octopus.Script"
-        environments = ["staging", "production"]
-        name = "Add to LB"
-        properties = {
-            Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Script.ScriptBody = <<-EOT
-                $machineName = $OctopusParameters["Octopus.Machine.Name"]
-                
-                Write-Host "Adding $machineName to the Load Balancer."
-            EOT
-            Octopus.Action.Script.ScriptSource = "Inline"
-            Octopus.Action.Script.Syntax = "PowerShell"
-        }
-        worker_pool = "default-worker-pool-1"
-    }
 }
 
-step "notify-developers-of-status" {
-    condition = "Always"
-    name = "Notify Developers of Status  "
+step "verify-trident-application" {
+    name = "Verify Trident Application "
 
     action {
-        action_type = "Octopus.Email"
+        action_type = "Octopus.Manual"
         properties = {
-            Octopus.Action.Email.Body = "#(Notification.Subject.Text) "
-            Octopus.Action.Email.IsHtml = "False"
-            Octopus.Action.Email.Subject = "#(Notification.Subject.Text) "
-            Octopus.Action.Email.ToTeamIds = "trident-notifications"
+            Octopus.Action.Manual.BlockConcurrentDeployments = "False"
+            Octopus.Action.Manual.Instructions = "Please Verify Trident Application "
+            Octopus.Action.Manual.ResponsibleTeamIds = "qa,global/octopus-managers"
         }
         worker_pool_variable = ""
     }
 }
 
-step "slack-send-simple-notification" {
-    condition = "Failure"
-    name = "Slack - Send On Fail"
+step "disable-maintenance-mode" {
+    name = "Disable Maintenance Mode"
 
     action {
+        action_type = "Octopus.Script"
         properties = {
             Octopus.Action.RunOnServer = "true"
-            Octopus.Action.Template.Id = "ActionTemplates-1"
-            Octopus.Action.Template.Version = "14"
-            ssn_Channel = "trident-deployment-notifications"
-            ssn_Color = "danger"
-            ssn_HookUrl = "#{Notification.Slack.Webhook.Url}"
-            ssn_IconUrl = "https://octopus.com/content/resources/favicon.png"
-            ssn_Message = "#{Notification.Body.Text}ssn_Message"
-            ssn_Title = "#(#{Notification.Subject.Text}"
-            ssn_Username = "Trident Project In Octopus Deploy"
+            Octopus.Action.Script.ScriptBody = <<-EOT
+                Write-Host "Disable Maintenance Mode"
+                
+            EOT
+            Octopus.Action.Script.ScriptSource = "Inline"
+            Octopus.Action.Script.Syntax = "PowerShell"
         }
         worker_pool = "default-worker-pool-1"
     }
